@@ -5,7 +5,7 @@ source "$BASEDIR/builddeps-veloxbe.sh"
 
 function build_for_spark {
   spark_version=$1
-  mvn clean package -Pbackends-velox -Pceleborn -Puniffle -Pspark-$spark_version -DskipTests
+  mvn clean package -Pbackends-velox -Pceleborn -Puniffle -Piceberg -Pdelta -Phudi -Pspark-3.4 -DskipTests
 }
 
 function check_supported {
