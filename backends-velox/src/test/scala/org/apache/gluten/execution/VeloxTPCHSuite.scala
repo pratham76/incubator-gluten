@@ -16,7 +16,7 @@
  */
 package org.apache.gluten.execution
 
-import org.apache.gluten.config.GlutenConfig
+import org.apache.gluten.GlutenConfig
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, Row, TestUtils}
@@ -114,6 +114,11 @@ abstract class VeloxTPCHSuite extends VeloxTPCHTableSupport {
           s"Actual Plan path: ${actualFile.getAbsolutePath}\n" +
           s"Golden Plan path: $path")
     }
+  }
+
+  override protected def sparkConf: SparkConf = {
+    super.sparkConf
+      .set(GlutenConfig.COLUMNAR_FORCE_SHUFFLED_HASH_JOIN_ENABLED.key, "true")
   }
 
   test("TPC-H q1") {
@@ -328,6 +333,18 @@ class VeloxTPCHV1BhjSuite extends VeloxTPCHSuite {
     super.sparkConf
       .set("spark.sql.sources.useV1SourceList", "parquet")
       .set("spark.sql.autoBroadcastJoinThreshold", "30M")
+  }
+}
+
+/** BroadcastBuildSideRelation use off-heap. */
+class VeloxTPCHV1BhjOffheapSuite extends VeloxTPCHSuite {
+  override def subType(): String = "v1-bhj-off-heap"
+
+  override protected def sparkConf: SparkConf = {
+    super.sparkConf
+      .set("spark.sql.sources.useV1SourceList", "parquet")
+      .set("spark.sql.autoBroadcastJoinThreshold", "30M")
+      .set(GlutenConfig.VELOX_BROADCAST_BUILD_RELATION_USE_OFFHEAP.key, "true")
   }
 }
 

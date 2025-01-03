@@ -16,8 +16,8 @@
  */
 package org.apache.spark.sql.delta
 
+import org.apache.gluten.GlutenConfig
 import org.apache.gluten.backendsapi.clickhouse.CHConf
-import org.apache.gluten.config.GlutenConfig
 
 import org.apache.spark.SparkException
 import org.apache.spark.sql.Dataset

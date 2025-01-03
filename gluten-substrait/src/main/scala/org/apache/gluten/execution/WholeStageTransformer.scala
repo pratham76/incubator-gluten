@@ -16,8 +16,8 @@
  */
 package org.apache.gluten.execution
 
+import org.apache.gluten.{GlutenConfig, GlutenNumaBindingInfo}
 import org.apache.gluten.backendsapi.BackendsApiManager
-import org.apache.gluten.config.{GlutenConfig, GlutenNumaBindingInfo}
 import org.apache.gluten.exception.{GlutenException, GlutenNotSupportException}
 import org.apache.gluten.expression._
 import org.apache.gluten.extension.ValidationResult
@@ -271,12 +271,11 @@ case class WholeStageTransformer(child: SparkPlan, materializeInput: Boolean = f
   override def nodeName: String = s"WholeStageCodegenTransformer ($transformStageId)"
 
   override def verboseStringWithOperatorId(): String = {
-    val nativePlan =
-      if (GlutenConfig.get.getConf(GlutenConfig.INJECT_NATIVE_PLAN_STRING_TO_EXPLAIN)) {
-        s"Native Plan:\n${nativePlanString()}"
-      } else {
-        ""
-      }
+    val nativePlan = if (conf.getConf(GlutenConfig.INJECT_NATIVE_PLAN_STRING_TO_EXPLAIN)) {
+      s"Native Plan:\n${nativePlanString()}"
+    } else {
+      ""
+    }
     super.verboseStringWithOperatorId() ++ nativePlan
   }
 
@@ -316,7 +315,7 @@ case class WholeStageTransformer(child: SparkPlan, materializeInput: Boolean = f
 
   def doWholeStageTransform(): WholeStageTransformContext = {
     val context = generateWholeStageTransformContext()
-    if (GlutenConfig.get.getConf(GlutenConfig.CACHE_WHOLE_STAGE_TRANSFORMER_CONTEXT)) {
+    if (conf.getConf(GlutenConfig.CACHE_WHOLE_STAGE_TRANSFORMER_CONTEXT)) {
       wholeStageTransformerContext = Some(context)
     }
     context
