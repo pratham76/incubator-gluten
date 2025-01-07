@@ -17,10 +17,10 @@
 package org.apache.gluten.backendsapi.velox
 
 import org.apache.gluten.GlutenBuildInfo._
-import org.apache.gluten.GlutenConfig
 import org.apache.gluten.backendsapi._
 import org.apache.gluten.columnarbatch.VeloxBatch
 import org.apache.gluten.component.Component.BuildInfo
+import org.apache.gluten.config.GlutenConfig
 import org.apache.gluten.exception.GlutenNotSupportException
 import org.apache.gluten.execution.WriteFilesExecTransformer
 import org.apache.gluten.expression.WindowFunctionsBuilder
@@ -155,18 +155,12 @@ object VeloxBackendSettings extends BackendSettingsApi {
 
       format match {
         case ParquetReadFormat =>
-          val typeValidator: PartialFunction[StructField, String] = {
-            // Parquet timestamp is not fully supported yet
-            case StructField(_, TimestampType, _, _)
-                if GlutenConfig.get.forceParquetTimestampTypeScanFallbackEnabled =>
-              "TimestampType(force fallback)"
-          }
           val parquetOptions = new ParquetOptions(CaseInsensitiveMap(properties), SQLConf.get)
           if (parquetOptions.mergeSchema) {
             // https://github.com/apache/incubator-gluten/issues/7174
             Some(s"not support when merge schema is true")
           } else {
-            validateTypes(typeValidator)
+            None
           }
         case DwrfReadFormat => None
         case OrcReadFormat =>
